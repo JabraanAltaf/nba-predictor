@@ -1,0 +1,10 @@
+#HomeTeams {
+    display: inline;
+    float: left;
+}
+
+#AwayTeams {
+    display: inline;
+    float: left;
+    padding-left: 5%;
+}
