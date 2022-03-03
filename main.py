@@ -6,6 +6,7 @@
 import requests, json 
 from datetime import date
 import csv
+import pandas as pd
 
 def get_date():
     # Today's date
@@ -17,6 +18,13 @@ def get_date():
     return int_date
 
 def get_schedule(int_date):     
+    Home = []
+    Away = []
+    # HomeW %
+    Hperc = []
+    # AwayW %
+    Aperc = []
+
     # URL
     url = requests.get(("https://data.nba.net/10s/prod/v1/{}/scoreboard.json").format(int_date))
     text = url.text
@@ -26,39 +34,33 @@ def get_schedule(int_date):
 
     #print(data)
     for i in range (len(data['games'])):
-        print ("------------------------------------")
-        print(data['games'][i]['vTeam']['triCode'], data['games'][i]['hTeam']['triCode'])
-       # print(data['games'][i]['vTeam']['win']) 
-       # print(data['games'][i]['vTeam']['loss']) 
-       # print("\n@\n")
-       # print(data['games'][i]['hTeam']['triCode']) 
-       # print(data['games'][i]['hTeam']['win']) 
-       # print(data['games'][i]['hTeam']['loss']) 
+        Home.append(data['games'][i]['hTeam']['triCode'])
+        Away.append(data['games'][i]['vTeam']['triCode'])
+        # Getting Home Team's Win % 
+        HomeW = round(int(data['games'][i]['hTeam']['win'])/(int(data['games'][i]['hTeam']['loss'])+int(data['games'][i]['hTeam']['win'])) * 100, 2)
+        # Getting Away Team's Win %
+        AwayW = round(int(data['games'][i]['vTeam']['win'])/(int(data['games'][i]['vTeam']['loss'])+int(data['games'][i]['vTeam']['win'])) * 100, 2)
 
-    return data
-
-def write_matchups_csv(int_date, data):
-    headers = ['Home','Away', 'homeW',"homeL", "awayW", "awayL"]
-   # data = json.loads(requests.get("https://data.nba.net/10s/prod/v1/20220302/scoreboard.json").text)
-    #with urllib.request.urlopen("https://data.nba.net/10s/prod/v1/20220302/scoreboard.json") as url:
-    #data = json.loads(url.read().decode())
+        Hperc.append(HomeW)
+        Aperc.append(AwayW)
+    #Create dictionary
+    dict = {'Home': Home,'HomeW%': Hperc, 'Away': Away, 'AwayW%': Aperc} 
 
 
+    return dict
+
+
+def write_matchups_csv(int_date, dict):
+
+    df = pd.DataFrame(dict)
     filename = 'nba-{}.csv'.format(int_date)
-    #print(len(data['games']))
-    with open(filename, 'w', encoding='UTF8') as f:
-        writer = csv.writer(f)
+    df.to_csv(filename) 
+   # print(df)
 
-        # write the header
-
-        writer.writerow(headers)
-
-        # write the data
-      #  writer.writerow(data)
 
 def main():
     date = get_date()
     schedule_data = get_schedule(date)
-    #write_matchups_csv(date, schedule_data)
+    write_matchups_csv(date, schedule_data)
 
 main()
