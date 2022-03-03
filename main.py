@@ -11,19 +11,21 @@ import pandas as pd
 def get_date():
     # Today's date
     today = date.today()
-
     # Get data in YMD format and cast as Int
     int_date = int(today.strftime("%Y%m%d"))
-
+    
     return int_date
 
 def get_schedule(int_date):     
     Home = []
     Away = []
-    # HomeW %
-    Hperc = []
-    # AwayW %
-    Aperc = []
+    # HomeWs
+    Hw = []
+    Hl = []
+    # AwayWs
+    Aw = []
+    Al = []
+
 
     # URL
     url = requests.get(("https://data.nba.net/10s/prod/v1/{}/scoreboard.json").format(int_date))
@@ -37,14 +39,22 @@ def get_schedule(int_date):
         Home.append(data['games'][i]['hTeam']['triCode'])
         Away.append(data['games'][i]['vTeam']['triCode'])
         # Getting Home Team's Win % 
-        HomeW = round(int(data['games'][i]['hTeam']['win'])/(int(data['games'][i]['hTeam']['loss'])+int(data['games'][i]['hTeam']['win'])) * 100, 2)
-        # Getting Away Team's Win %
-        AwayW = round(int(data['games'][i]['vTeam']['win'])/(int(data['games'][i]['vTeam']['loss'])+int(data['games'][i]['vTeam']['win'])) * 100, 2)
+        HomeWins = int(data['games'][i]['hTeam']['win'])
+        AwayWins = int(data['games'][i]['vTeam']['win'])
 
-        Hperc.append(HomeW)
-        Aperc.append(AwayW)
+        HomeLoss = int(data['games'][i]['hTeam']['loss'])
+        AwayLoss = int(data['games'][i]['vTeam']['loss'])
+        #HomeW = round(int(data['games'][i]['hTeam']['win'])/(int(data['games'][i]['hTeam']['loss'])+int(data['games'][i]['hTeam']['win'])) * 100, 2)
+        # Getting Away Team's Win %
+       # AwayW = round(int(data['games'][i]['vTeam']['win'])/(int(data['games'][i]['vTeam']['loss'])+int(data['games'][i]['vTeam']['win'])) * 100, 2)
+
+        Hw.append(HomeWins)
+        Aw.append(AwayWins)
+
+        Hl.append(HomeLoss)
+        Al.append(AwayLoss)
     #Create dictionary
-    dict = {'Home': Home,'HomeW%': Hperc, 'Away': Away, 'AwayW%': Aperc} 
+    dict = {'Home': Home,'HomeW': Hw, 'HomeL': Hl,'Away': Away, 'AwayW': Aw, 'AwayL': Al} 
 
 
     return dict
@@ -52,10 +62,9 @@ def get_schedule(int_date):
 
 def write_matchups_csv(int_date, dict):
 
-    df = pd.DataFrame(dict)
+    df = pd.DataFrame(dict, index=None)
     filename = 'nba-{}.csv'.format(int_date)
     df.to_csv(filename) 
-   # print(df)
 
 
 def main():

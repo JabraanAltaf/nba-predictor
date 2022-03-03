@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Predictor</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>        
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <h2 id="HomeTeams"><h3 id = "HomeRecord"></h3></h2>
+    <h3 id = "HomeRecord"></h3>
+    <h2 id="AwayTeams"></h2>
+    <h3 id = "AwayRecord"></h3>
+
+    <script>
+        d3.csv("nba-20220303.csv").then(function(data) {
+            console.log(data[0]);
+            let homeTeam = document.getElementById("HomeTeams");
+            let awayTeam = document.getElementById("AwayTeams");
+            let homeRecord = document.getElementById("HomeRecord");
+            let awayRecord = document.getElementById("AwayRecord");
+            
+            for (let i =0; i < 7; i++) {
+                homeTeam.innerHTML += data[i].Home +  "<br/>" + data[i].HomeW + "W " + data[i].HomeL + "L"+ "<br/>" + `<button id=h${i} onClick="reply_click(this.id)">Select</button>` + "<br/><br/>";
+                
+                awayTeam.innerHTML += data[i].Away + "<br/>" + data[i].AwayW + "W " + data[i].AwayL + "L" + "<br/>" + `<button id=a${i} onClick="reply_click(this.id)">Select</button>` + "<br/><br/>";
+                
+            } 
+
+            
+        });
+        
+
+        function reply_click(clicked_id) {
+            // Checks to see which button was pressed
+            alert(clicked_id);
+            // Code to be done: Add in which was clicked in to a df
+        }
+    </script>
+</body>
+</html>
